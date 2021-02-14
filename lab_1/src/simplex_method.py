@@ -1,6 +1,6 @@
 
 import numpy as np
-from src.data_structure import CanonicalForm,NpCanonicalForm
+from src.data_structure import canonical_form,np_canonical_form
 from src.additional_algo import subset_by_index,binomial_grid
 
 
@@ -55,7 +55,7 @@ def calc_BNkM(AMNk: np.ndarray) -> np.ndarray:
     return np.linalg.inv(AMNk)
 
 
-def starting_vector(cf:NpCanonicalForm) -> np.array:
+def starting_vector(cf:np_canonical_form) -> np.array:
     binom_table = binomial_grid(cf.n, cf.m)
     N = np.array(list(range(cf.n)))
     for idx in range(binom_table[-1, -1]):
@@ -73,7 +73,7 @@ def starting_vector(cf:NpCanonicalForm) -> np.array:
     return np.zeros(cf.n)
 
 
-def simplex_step(cf: NpCanonicalForm, xkN: np.array) -> (np.array, np.array, bool):
+def simplex_step(cf: np_canonical_form, xkN: np.array) -> (np.array, np.array, bool):
     """
     Совершает один шаг алгоритма симплекс-метода. Обозначения и процедура взяты из пособия
     Петухов и др., стр. 88
@@ -121,7 +121,7 @@ class SimplexResult:
         self.x, self.Nk, self.is_solution = x, Nk, is_solution
 
 
-def simplex_method(cf: NpCanonicalForm, x_start: np.array, max_iter: int = 20) -> SimplexResult:
+def simplex_method(cf: np_canonical_form, x_start: np.array, max_iter: int = 20) -> SimplexResult:
     xkN, Nk = x_start, np.array([])
     for _ in range(max_iter):
         xkN, Nk, stopIteration = simplex_step(cf, xkN)

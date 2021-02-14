@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class CanonicalForm:
+class canonical_form:
     """
     Класс, хранящий входные данные канонической формы задачи линейного программирования.
     Обозначения переменных: пособие Петухова и др., стр. 80, ф.-ла (4.25)
@@ -18,12 +18,12 @@ class CanonicalForm:
         self.A, self.b, self.c = A, b, c
 
 
-class NpCanonicalForm:
+class np_canonical_form:
     """
     Представление канонической формы в виде массивов NumPy (в отличие от списков в `CanonicalForm`)
     """
 
-    def __init__(self, cf: CanonicalForm):
+    def __init__(self, cf: canonical_form):
         self.n, self.m = cf.n, cf.m
         self.A = np.array([np.array(row) for row in cf.A])
         self.b = np.array(cf.b)

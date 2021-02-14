@@ -74,7 +74,7 @@ def сreate_system(A, b, c, vectors, w):
             if w[i] != 0:
                 d.append(0)
 
-    return structure.CanonicalForm(B, b, d)
+    return structure.canonical_form(B, b, d)
 
 
 def print_system(A, b, c, x, vectors, w, func, MatrixSigns, VariablesSigns):  # Красивый вывод полученных систем
