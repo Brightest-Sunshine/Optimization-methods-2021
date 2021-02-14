@@ -86,8 +86,9 @@ def simplex_step(cf: np_canonical_form, xkN: np.array) -> (np.array, np.array, b
     """
     AMN, cN = cf.A, cf.c
     _, _, Nk0, Nk_plus = split_xkN(xkN) # Nk0 - индексы нулевых компонент xk, Nk+ - положительных
-    binomGrid = binomial_grid(len(Nk0), cf.m - len(Nk_plus))  # вспомог. структура для построения комбинаций столбцов, присоединяемых к A[M,Nk+]
-    #for binom_idx in range(binomGrid[-1, -1] - 1, -1, -1):  # итерируемся по комбинациям векторов, присоединяемых к A[M,Nk+]
+    binomGrid = binomial_grid(len(Nk0), cf.m - len(Nk_plus))  # вспомог. структура для построения комбинаций
+    # столбцов, присоединяемых к A[M,Nk+] for binom_idx in range(binomGrid[-1, -1] - 1, -1, -1):  # итерируемся по
+    # комбинациям векторов, присоединяемых к A[M,Nk+]
     for binom_idx in range(binomGrid[-1, -1]):
     # В первом порядке алг-м слишком быстро находит решение нашей задачи
         AMNk, Nk, Lk = new_AMNk(AMN, xkN, binomGrid, binom_idx)  # дополняем Nk+ до Nk так, что A[M, Nk] квадратная
