@@ -47,7 +47,7 @@ class reader:
 
     @staticmethod
     def read_num_line(line):
-        return [int(x) for x in line.split()]
+        return [float(x) for x in line.split()]
 
     @staticmethod
     def show_data(data):
