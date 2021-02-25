@@ -40,3 +40,28 @@ class TransportTask:
             elem.append(0)
         self.vector_importer.append(diff)  # Фиктивный потребитель
         return
+
+
+class OneLineEquation:
+    def __init__(self, var_1, var_2, value):
+        self.var_1 = var_1
+        self.var_2 = var_2
+        self.var_1_val = 0
+        self.var_2_val = 0
+        self.value = value
+        self.solved = False
+
+    def __str__(self):
+        return self.var_1 + "-" + self.var_2 + "=" + str(self.value)
+
+    def solve(self, var, value):
+        self.solved = True
+        if var == self.var_1:
+            self.var_1_val = value
+            self.var_2_val = value - self.value
+            return self.var_2_val
+        else:
+            self.var_2_val = value
+            self.var_1_val = value + self.value
+            return self.var_1_val
+
