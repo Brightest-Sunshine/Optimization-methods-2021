@@ -58,10 +58,12 @@ class OneLineEquation:
         self.solved = True
         if var == self.var_1:
             self.var_1_val = value
-            self.var_2_val = value - self.value
+            #self.var_2_val = value - self.value #rod
+            self.var_2_val = -value + self.value
             return self.var_2_val
         else:
             self.var_2_val = value
-            self.var_1_val = value + self.value
+            #self.var_1_val = value + self.value #rod
+            self.var_1_val = -value + self.value
             return self.var_1_val
 

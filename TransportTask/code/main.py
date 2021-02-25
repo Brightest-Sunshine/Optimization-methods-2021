@@ -14,7 +14,8 @@ for line in start_plan:
 print("cost matrix")
 for line in task.matrix_cost:
     print(line)
-print(task.vector_importer)
-print(task.vector_exporter)
+print("vector importer ", task.vector_importer)
+print("vector exporter", task.vector_exporter)
 print(calculate_function(start_plan, task.matrix_cost))
-pm.run_potential_method(task, start_plan)
+res_plan = pm.run_potential_method(task, start_plan, task.matrix_cost)
+print("result", calculate_function(res_plan, task.matrix_cost))
