@@ -1,11 +1,12 @@
 from TransportTask.code import data_structure as ds
 from TransportTask.code.algorithms import north_west_method, calculate_function
 from TransportTask.code import potential_method as pm
+from TransportTask.code import file_reader
 
-task = ds.TransportTask([[3, 11, 3, 10], [1, 9, 2, 8], [7, 4, 10, 5]], [3, 6, 5, 6], [7, 4, 9])
-# print(task.matrix_cost)
-# print(task.vector_importer)
-# print(task.vector_exporter)
+#task = ds.TransportTask([[3, 11, 3, 10], [1, 9, 2, 8], [7, 4, 10, 5]], [3, 6, 5, 6], [7, 4, 9])
+with file_reader.reader("problem.txt") as data:
+    matrix, import_, export = data
+    task = ds.TransportTask(matrix,import_,export)
 start_plan = north_west_method(task)
 # print(task.matrix_cost)
 print("start plan")

@@ -15,14 +15,10 @@ def north_west_method(get_task: TransportTask):  # Создаем начальн
         elif possible_max == task.vector_importer[point[1]]:  # Заполнили импортера
             close_column(task, point[1], point[0], possible_max)
             point[1] += 1
-            # print("right")
-            # print(point)
             task.vector_exporter[point[0]] -= possible_max
 
         else:
-            # print("down")
             close_line(task, point[1], point[0], possible_max)
-            # print(point)
             point[0] += 1
             task.vector_importer[point[1]] -= possible_max
 
