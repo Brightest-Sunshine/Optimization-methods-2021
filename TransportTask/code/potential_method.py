@@ -21,22 +21,23 @@ def check_optimal(v_export, v_import, plan, m_coast):
             if plan[i][j] == 0:
                 if v_import[j] + v_export[i] > m_coast[i][j]:
                 #if v_import[j] - v_export[i] > m_coast[i][j]:  #rod
-                    print(i,j)
+                    #print("plan here",v_import[j]+v_export[i])
+                    #print(i, j)
                     return False
 
     return True
 
 
-def find_new_working_point(v_export, v_import, plan):
+def find_new_working_point(v_export, v_import, plan, matrix_cost):
     maximum = 0
     point = [0, 0]
     for i in range(len(plan)):
         for j in range(len(plan[0])):
             if plan[i][j] == 0:
-                if abs(v_import[j] + v_export[i]) > maximum:
+                if (v_import[j] + v_export[i] - matrix_cost[i][j]) > maximum:
                 #if abs(v_import[j] + v_export[i]) > maximum:  #rod
                     #maximum = abs(v_import[j] - v_export[i])  #rod
-                    maximum = abs(v_import[j] + v_export[i])
+                    maximum = abs(v_import[j] + v_export[i] - matrix_cost[i][j])
                     point = [i, j]
     return point
 
@@ -66,11 +67,11 @@ def convert_to_vectors(result: dict):
         else:
             importers.append([int(keys[i].split('_')[1]), values[i]])
 
-    # print(exporters)
-    # print(importers)
-    # Узкое горло, как я понимаю dict хранит числа в удобном порядке, те алфавитный + номерной
-    # От этого достаточно просто собрать второй элемент
-    # Можно для достоверности через лямбду тут отстортировать
+    #print("СОРТАНУЛИ")
+    exporters.sort(key = lambda x: x[0])
+    importers.sort(key=lambda x: x[0])
+    #print(exporters)
+    #print(importers)
     vector_export = [elem[1] for elem in exporters]
     vector_import = [elem[1] for elem in importers]
     return vector_export, vector_import
@@ -146,7 +147,8 @@ def walk(point, current_direction, plan, starting_point, visited, prev_point):
             # print(point)
             # print("find=", find)
             # print(path)
-            path.append(point)
+            if not equal_point(direction, current_direction):  # Можем применить к направлениям, тк по сути это точки
+                path.append(point)
             if find:
                 return find, path
         visited.remove(point_id)
@@ -168,7 +170,7 @@ def find_min(way, plan):
 
 def change_plan(plan, start_point):
     way = find_way(start_point, plan)
-    print(way)
+    #print(way)
     minus = True
     for i in range(len(way)):
         if minus:
@@ -176,11 +178,11 @@ def change_plan(plan, start_point):
         else:
             way[i].append("+")
         minus = not minus
-    print(way)
+    print("Ломаная пути",way)
     minimum = find_min(way, plan)
     plan[start_point[LINE]][start_point[COL]] = minimum
     for elem in way:
-        print(elem)
+        #print(elem)
         if elem[2] == "-":
             plan[elem[LINE]][elem[COL]] -= minimum
         else:
@@ -191,23 +193,23 @@ def change_plan(plan, start_point):
 def run_potential_method(task: TransportTask, start_plan, matrix_cost):
     plan = start_plan
     checking_var = len(task.vector_exporter) + len(task.vector_importer) - 1
-    #while True:
-    for i in range(5):
+    while True:
+    #for i in range(5):
         if checking_var == check_filled_value(plan):
             print("Заполнение верное")
             export_potential, import_potential = solve_linear_system(task, plan)
-            print(export_potential)
-            print(import_potential)
+            print("Производители ",export_potential)
+            print("Потребители ",import_potential)
             optimal = check_optimal(export_potential, import_potential, plan, task.matrix_cost)
             if optimal:
-                print("ENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+                print("END")
                 break
             else:
-                print("SAAAAAAAAAAAAAAAAAAAAAAAAAD")
+                print("CONTINUE")
                 print(calculate_function(plan, matrix_cost))
 
-            working_point = find_new_working_point(export_potential, import_potential, plan)
-            print(working_point)
+            working_point = find_new_working_point(export_potential, import_potential, plan, task.matrix_cost)
+            print("Новая изменяемая точка",working_point)
 
             plan = change_plan(plan, working_point)
             print("new plan")
