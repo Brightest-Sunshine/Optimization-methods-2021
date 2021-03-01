@@ -152,7 +152,7 @@ def find_min(way, plan):
         if elem[2] == '-':
             if plan[elem[LINE]][elem[COL]] < min_elem:
                 point = [elem[LINE], elem[COL]]
-                #print("point changed",point)
+                # print("point changed",point)
                 min_elem = plan[elem[LINE]][elem[COL]]
     return min_elem, point
 

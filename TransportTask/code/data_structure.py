@@ -31,7 +31,7 @@ class TransportTask:
             return
 
     def make_fictive_exporter(self, diff):
-        self.matrix_cost.append([0 for x in self.vector_importer])  # Добавляем строчку 0
+        self.matrix_cost.append([0 for _ in self.vector_importer])  # Добавляем строчку 0
         self.vector_exporter.append(diff)  # Добавляем прозводство фиктивного
         return
 
@@ -52,7 +52,7 @@ class OneLineEquation:
         self.solved = False
 
     def __str__(self):
-        return self.var_1 + "-" + self.var_2 + "=" + str(self.value)
+        return self.var_1 + "+" + self.var_2 + "=" + str(self.value)
 
     def solve(self, var, value):
         self.solved = True
@@ -66,4 +66,3 @@ class OneLineEquation:
             #self.var_1_val = value + self.value #rod
             self.var_1_val = -value + self.value
             return self.var_1_val
-
