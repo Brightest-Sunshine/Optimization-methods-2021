@@ -1,0 +1,916 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\documentclass[a4paper]{article}
+\usepackage[12pt]{extsizes}
+\usepackage{amsthm, amssymb, amsmath, amsfonts, nccmath, empheq}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref} 
+\usepackage{color,colortbl} 
+\renewcommand{\labelenumii}{\Roman{enumii}}
+\usepackage[warn]{mathtext}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+\usepackage{tocloft}
+\linespread{1.5}
+\usepackage{indentfirst}
+\usepackage{setspace}
+%\полуторный интервал
+\onehalfspacing
+
+
+\newtheorem{theorem}{Теорема}
+\newtheorem{corollary}{Следствие}[theorem]
+
+\definecolor{darkishgreen}{RGB}{39,203,22}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+\definecolor{Gray}{RGB}{181, 184, 177}
+\definecolor{lightRed}{RGB}{230,170,150}
+\definecolor{modRed}{RGB}{230,82,90}
+\definecolor{strongRed}{RGB}{230,6,6}
+\definecolor{myGren}{RGB}{196, 230, 255}
+
+
+\newcommand{\RomanNumeralCaps}[1]
+    {\MakeUppercase{\romannumeral #1}}
+
+\usepackage{amssymb}
+
+\usepackage{graphicx, float}
+\graphicspath{{pictures/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\usepackage[left=20mm,right=1cm,
+    top=2cm,bottom=20mm,bindingoffset=0cm]{geometry}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+\addto\captionsrussian{\renewcommand{\contentsname}{СОДЕРЖАНИЕ}}
+
+\usepackage{fancyhdr}
+\usepackage[nottoc]{tocbibind}
+
+\fancypagestyle{plain}{%
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{\thepage}
+}
+
+\usepackage{blindtext}
+\pagestyle{myheadings}
+% href
+\usepackage{hyperref}
+\setcounter{MaxMatrixCols}{20}
+
+
+
+
+
+\begin{document}
+\begin{titlepage}
+  \begin{center}
+  
+     
+    \large
+    
+    Санкт-Петербургский политехнический университет Петра Великого
+    
+    Институт прикладной математики и механики
+    
+    \textbf{Высшая школа прикладной математики и вычислительной физики}
+    
+    \vfill
+     
+     
+    \textsc{\textbf{\Large{Лабораторная работа №2}}}\\[5mm]
+     
+    {\large \textbf{Тема: <<Решение задач транспортного типа>>}}
+    
+    \\ по дисциплине\\ <<Методы оптимизаций>>\\
+
+\end{center}
+
+\vfill
+
+
+\begin{tabular}{l p{140} l}
+Выполнили студенты \\группы 3630102/80401   
+
+&  &Мамаева Анастасия Сергеевна\\
+&  &Веденичев Дмитрий Александрович\\
+&  &Тырыкин Ярослав Алексеевич\\
+
+Руководитель\\Доцент, к.ф.-м.н.& \hspace{0pt} &   Родионова Елена Александровна \\\\
+\end{tabular}
+
+\hfill \break
+\hfill \break
+\begin{center} Санкт-Петербург \\2021 \end{center}
+\thispagestyle{empty}
+ 
+\end{titlepage}
+\newpage
+\begin{center}
+    \setcounter{page}{2}
+    \tableofcontents  
+\end{center}
+
+\newpage
+\section{Постановка задачи}
+
+\noindent Имеется транспортная таблица
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 & 8 & 5 & 7 & 5 & 4 & 11\\ \hline
+       \cellcolor{myGren} A_2 & 9 & 6 & 8 & 2 & 3 & 15\\  \hline
+       \cellcolor{myGren} A_3 & 7 & 4 & 7 & 1 & 4 & 10\\ \hline
+       \cellcolor{myGren} A_4 & 5 & 4 & 7 & 1 & 2 & 10\\ \hline \hline
+            & 11 & 8 & 10 & 9 & 8 & \\
+            \hline
+    \end{tabular}
+    \label{tab:Tabel1}
+\end{table}
+
+\noindent Необходимо:
+\begin{enumerate}
+    \item Решить транспортную задачу методом потенциалов с выбором начального приближения методом северо-западного угла.
+    \item Решить эту же задачу симплекс-методом, сравнить результаты.
+    \item Проверить оптимальность полученного решения.
+    \item Решить транспортную задачу с усложнением, когда объём хранимого больше объёма доставок.
+\end{enumerate}
+
+\section{Применимость методов}
+
+\noindent Пусть имеется $n$ пунктов хранения, в которых сосредоточен однотипный груз, и $m$ пунктов назначения.
+\\\\
+Известны:
+\begin{itemize}
+    \item $a_i$ - количество груза в $i$-ом пункте хранения
+    \item $b_j$ - суточная потребность в $j$-ом пункте назначения
+    \item $c_{ij}$ - стоимость перевозки единицы груза из $i$-ого в $j$-ый пункт
+\end{itemize}
+\\\\
+Необходимо составить план перевозок так, чтобы минимизировать стоимость проекта. Рассмотрим, как такую задачу можно формализовать.
+\\\\
+В качестве переменных естественно выбрать двухиндексные характеристики: $x_{ij}$ показывают, сколько груза перевозят из $i$-ого в $j$-ый пункт. Из физического смысла следует, что: 
+$$x_{ij} \ge 0$$
+Весь груз, который вывезен из $i$-ого пункта во все пункты назначения, не может превосходить того количества, которое хранилось изначально:
+$$\displaystyle\sum_{j=1}^{m} x_{ij} \le a_i ,~~i = 1,...,n$$
+Интерпретируем условие, что мы должны удовлетворить потребности в грузе в каждом пункте назначения:
+$$\displaystyle\sum_{i=1}^{n} x_{ij} = b_j ,~~j = 1,...,m$$
+Выражение для функции цели запишется в виде:
+$$\displaystyle\sum_{i=1}^{n}\sum_{j=1}^{m} c_{ij}x_{ij} \longrightarrow min$$
+Условием корректности постановки задачи по исходным данным является условие:
+$$\displaystyle\sum_{i=1}^{n} a_{i} \ge \displaystyle\sum_{j=1}^{m} b_{j}$$
+Если транспортная задача содержит знаки в виде неравенств, то такая задача называется открытой. Но если выполнено условие
+$$\displaystyle\sum_{j=1}^{m} x_{ij} = a_i~ \Rightarrow ~  \displaystyle\sum_{i=1}^{n} a_{i} = \displaystyle\sum_{j=1}^{m} b_{j}$$
+то задача называется закрытой.
+\\\\
+Для того, чтобы применять методы, разработанные для решения транспортных задач, она должна быть приведена к закрытому типу. Проверим выполнение данного условия к нашей задаче.
+$$\displaystyle\sum_{i=1}^{4} a_{i} = A_1 + A_2 + A_3 + A_4 = 11 + 15 + 10 + 10 = 46$$
+$$\displaystyle\sum_{j=1}^{5} b_{j} = B_1 + B_2 + B_3 + B_4 + B_5 = 11 + 8 + 10 + 9 + 8 = 46$$
+Видим, что суммы совпадают, наша задача - закрытого типа.
+
+\section{Описание алгоритмов}
+\noindent Для того, чтобы найти начальное приближение (начальный план) воспользуемся методом северо-западного угла.
+\subsection{Метод северо-западного угла}
+
+\noindent На вход поступает: запас, потребность
+\begin{enumerate}
+    \item Будем двигаться по таблице и заполнять её соответствующими объёмами перевозок в северо-западном направлении. То есть будем начинать с верхнего левого угла, клетки (1, 1).
+    \item Ищем минимум $min\{запас[i], потребность[j]\}$ и заполняемым полученным результатом текущую ячейку, в которой находимся.
+    \item Вычитаем из $запас[i]$ и $потребность[j]$ найденный минимальный элемент.
+    \item Передвигаемся вправо по матрице $(j = j + 1)$, если $запас[i]~!=~0$\\
+    Передвигаемся вниз $(i = i + 1)$, если $потребность[j]~!=~0$, \\
+    иначе двигаемся по диагонали.
+    \item Повторяем действия 2 - 4, пока не окажемся в правой нижней ячейке $(n, m)$.
+\end{enumerate}
+
+\noindent По вышеизложенному алгоритму построим начальный план для исходной задачи.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 & \cellcolor{Gray} 11 & \cellcolor{Gray}- & \cellcolor{Gray}- & \cellcolor{Gray}- & \cellcolor{Gray}- & \cellcolor{Gray}11\\ \hline
+       \cellcolor{myGren} A_2 & \cellcolor{Gray}- &  &  &  &  & 15\\  \hline
+       \cellcolor{myGren} A_3 & \cellcolor{Gray}- &  &  &  &  & 10\\ \hline
+       \cellcolor{myGren} A_4 & \cellcolor{Gray}- &  &  &  &  & 10\\ \hline \hline
+            & \cellcolor{Gray}11 & 8 & 10 & 9 & 8 & \\
+            \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+\noindent В клетку (1, 1) запишем $min\{11, 11\} = 11$. Закроем оставшиеся клетки столбца и строки прочерками.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & \cellcolor{Gray}8 & \cellcolor{Gray} & \cellcolor{Gray} & \cellcolor{Gray} & \cellcolor{Gray} 15\\  \hline
+       \cellcolor{myGren} A_3 & - & \cellcolor{Gray}- &  &  &  & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & \cellcolor{Gray}- &  &  &  & 10\\ \hline \hline
+            & 11 & \cellcolor{Gray} 8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В клетку (2, 2) запишем $min\{8, 15\} = 8$. Закроем оставшиеся клетки столбца прочерками.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & \cellcolor{Gray}7 & \cellcolor{Gray}- & \cellcolor{Gray}- & \cellcolor{Gray}15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & \cellcolor{Gray}  &  &  & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & \cellcolor{Gray} &  &  & 10\\ \hline \hline
+            & 11 &  8 & \cellcolor{Gray}10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В клетку (3, 2) запишем $min\{7, 10\} = 7$. Закроем оставшиеся клетки строки прочерками.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & \cellcolor{Gray}3 & \cellcolor{Gray} &\cellcolor{Gray}  & \cellcolor{Gray}10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & \cellcolor{Gray}- &  &  & 10\\ \hline \hline
+            & 11 &  8 & \cellcolor{Gray}10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В клетку (3, 3) запишем $min\{3, 7\} = 3$. Закроем оставшиеся клетки столбца прочерками.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & \cellcolor{Gray}7 &\cellcolor{Gray} - & \cellcolor{Gray}10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & \cellcolor{Gray}  &  & 10\\ \hline \hline
+            & 11 &  8 & 10 &\cellcolor{Gray} 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В клетку (4, 3) запишем $min\{7, 9\} = 7$. Закроем оставшиеся клетки строки прочерками.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & 7 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & \cellcolor{Gray}2 & \cellcolor{Gray} & \cellcolor{Gray}10\\ \hline \hline
+            & 11 &  8 & 10 &\cellcolor{Gray} 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В клетку (4, 4) запишем $min\{2, 8\} = 2$.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & 7 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & 2 & \cellcolor{Gray}8 & \cellcolor{Gray}10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & \cellcolor{Gray}8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent В последнюю незаполненную клетку (5, 4) запишем $min\{8, 10\} = 8$.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & - &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & 7 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & 2 & 8 & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\subsection{Проверка опорного плана на вырожденность}
+
+\noindent Система 
+\begin{equation*}
+    \begin{cases}
+    \displaystyle\sum_{j=1}^{m} x_{ij} = a_i,~~1 \le i \le n\\
+    \displaystyle\sum_{i=1}^{n} x_{ij} = b_j,~~1 \le j \le m\\
+    x_{ij} \ge 0\\
+    \end{cases}
+\end{equation*}
+имеет $m+n$ уравнений относительно $x_{ij}$. Условие закрытого типа (наличие равенств) позволяет выразить явно одну переменную через другие. Значит базисная система будет состоять из $n + m - 1$ уравнений.
+\\\\
+Следовательно первым делом, как получили начальное приближение, мы должны проверить, сколько заполненых клеток в таблице. В нашем случае $m = 4$, $n = 5$, значит должно быть занято $4+5-1=8$ ячеек, но видим что это не так.
+\\\\
+\noindent Принимая это во внимание, заключаем, что опорный план - вырожденный. А значит мы должны пополнить его фиктивным элементом - нулём. Важно помнить, что проверку на вырожденность надо производить и в дальнейшем, каждый раз после построения очередного цикла пересчёта.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & 0 &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & 7 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & 2 & 8 & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent Получили точку, которая является допустимой:
+  $$ x^{0}= (11~0~0~0~0~0~8~7~0~0~0~0~3~7~0~0~0~0~2~8)$$
+  $$f(x^{0}) = 11\cdot 8 + 8\cdot 6 + 7 \cdot 8 + 3 \cdot 7 + 7 \cdot 1 + 2 \cdot 1 + 8\cdot 2 = 238$$
+Очевидно, что полученный план не является оптимальным, так как при заполнении клеток мы вовсе не учитывали их стоимости.
+
+\subsection{Метод потенциалов}
+
+\noindent Для решения транспортных задач в табличной форме используется метод потенциалов. Представим симплекс таблицу
+\begin{equation*}
+    \left(\begin{array}{cccc|c}  
+    x_{11} & x_{12} & \ldots & x_{1m} & u_1\\
+    x_{21} & x_{22} & \ldots & x_{2m} & u_2\\
+    \vdots & \vdots & \ddots & \vdots & \vdots\\
+    x_{n1} & x_{n2} & \ldots & x_{nm} & u_n\\
+    \hline
+    v_1 & v_2 & \ldots & v_m &\\
+    \end{array}\right)
+\end{equation*}
+\\\\
+Сопоставим каждой строчке переменную, которую назовём потенциалом $u_i$, а каждому столбцу переменную $v_j$. 
+\begin{theorem}
+Для того, чтобы $x_{*}[N]$ была оптимальной точкой в задаче линейного программирования необходимо и достаточно, чтобы $\exists y_{*}[M]$ такой, что
+\begin{equation*}
+    c^T[N]-y_{*}^T[M] \cdot A[M,N] \ge 0
+\end{equation*}
+\begin{equation*}
+    (c^T[N]-y_{*}^T[M] \cdot A[M,N]) \cdot x_{*}[N] = 0
+\end{equation*}
+\label{th}
+\end{theorem}
+\\\\
+\noindent Если проанализируем условие оптимальности для потенциалов, то увидим, что эти условия соответствуют получению решений, отвечающих условиям
+$$u_i+v_j=c_{ij}$$ $$u_i+v_j \le c_{ij}$$
+
+\paragraph{Алгоритм метода потенциалов}
+\begin{enumerate}
+    \item Вычисляются векторы потенциалов для базисных клеток $u \in \mathbb{R}^m$, $v \in \mathbb{R}^n$ из условий
+    $$u_i+v_j=c_{ij},~~x_{ij}>0 $$ Поскольку в полученой системе $n + m - 1$ уравнений и $n + m$ переменных, введем искусственное ограничение $v_0 = 0$. Далее решаем СЛАУ, поочередно выражая переменные через друг друга.
+    \item Для свободных клеток, то есть для несвязанных пар <<поставщик-продавец>>, вычисляются сумма потенциалов $\alpha_{ij} = u_i+v_j$
+    \item Если $\forall~i,~j:~ x_{ij}=0~ \rightarrow ~ \alpha_{ij} \le c_{ij}$, то как следует из результатов теории двойственности \cite{book2}, план оптимальный и процесс завершается. В противном случае продолжаем алгоритм: переходим к пересчёту плана.
+    \item Выберем $(i,j)=argmax_{i,j}( \alpha_{ij} - c_{ij})$. Ячейка с координатами $(i,j)$ - вводимая в план перевозок.
+    \item Находим цикл пересчёта - замкнутую последовательность перемещений внутри таблицы по горизонтали и вертикали попеременно, начинающуюся и кончающуюся во вводимой клетке, в которой все ячейки, где меняется направление - заполненны.
+    \item Выбираем минимальное значение $\theta$ из всех объёмов перевозок в вершинах цикла. Добавляем его в клетку, бывшую пустой, вычитаем из следующей в цепочке, добавляем к третьей и так далее поочередно. Клетка, значение перевозок в которой было равно $\theta$, помечается как пустая. Можно показать, что объёмы поставок после этой операции остаются прежними как у поставщиков, так и у потребителей.
+    \item После изменения плана перевозок возвращаемся к первому пункту - пересчитываем потенциалы, их сумму и продолжаем алгоритм.
+\end{enumerate}
+
+\subsection{Поиск цикла пересчёта} 
+\noindent Предварительно оговорим, что мы можем двигаться только вверх-вниз-вправо-влево (двумерная окрестность фон-Неймана порядка 1). Создадим множество, в которое будем складывать посещённые вершины. В цикле по всевозможным направлениям для стартовой ячейки находим, какая будет следующей. Для неё запускаем функцию <<Walk>>
+\paragraph{Описание функции <<Walk>>}
+\begin{enumerate}
+    \item Проверяем, не вышли ли мы за границы/посещали ли мы эту ячейку ранее. 
+    \item Проверяем тип ячейки: базисная или нет
+    \item Помечаем ячейку как посещенную.
+    \item 
+    \begin{enumerate}
+        \item Если ячейка оказалась не базисной, то продолжаем движение в текущем направлении и запускаем функцию <<Walk>> для следующей клетки.
+        \item Если ячейка базисная, то по всем доступным направлениям считаем следующую ячейку и запускаем для них <<Walk>>
+        \item Если ячейка начальная, то возвращаемся из рекурсии функций <<Walk>>, записывая базисные ячейки, в которых мы поменяли направление.
+    \end{enumerate}
+\end{enumerate}
+
+\noindent Покажем первую итерацию метода потенциалов: 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  11 & 0 &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 8 & 7 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 3 & 7 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & - & - & - & 2 & 8 & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+\noindent Выберем пустую ячейку, с которой начнём строить цикл, пусть это будет клетка $(4, 1)$
+Ломанная пути будем иметь вид:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  \cellcolor{Gray}11/- & \cellcolor{Gray}0/+ &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & \cellcolor{Gray}- & \cellcolor{Gray}8/- & \cellcolor{Gray}7/+ & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & \cellcolor{Gray}- & - & \cellcolor{Gray}3/- & \cellcolor{Gray}7/+ & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & \cellcolor{Gray}-/+ & \cellcolor{Gray}- & \cellcolor{Gray}- & \cellcolor{Gray}2/- & 8 & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent Выбираем клетки, в которых записал <<->> и ищем среди них минимальное число: 
+$$min\{2,~3,~8,~11 \}=2$$
+Тогда после пересчета, таблица будет выглядеть:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 & 9 & 2 &- & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & 6 & 9 & - & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & - & 1 & 9 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & 2 & - & - & - & 8 & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\section{Результаты решения задачи}
+\noindent В результате выполнения программы получили оптимальный опорный план: 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  - & 1 & 10 & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & - & - & 7 & 8 & 15\\  \hline
+       \cellcolor{myGren} A_3 & 1 & 7 & - & 2 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & 10 & - & - & - & - & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+\noindent Векторы потенциалов при этом равны: 
+\begin{equation*}
+u^*=
+    \begin{pmatrix}
+        0 &0 &-1 &-3
+    \end{pmatrix}
+,\;\;v^*=
+    \begin{pmatrix}
+        8 &5 &7 &2 &3
+    \end{pmatrix}\\
+\end{equation*}
+
+\noindent Вычислив значение целевой функции, получим:
+$$F =  1\cdot 5 + 10\cdot 5 + 7\cdot 2 + 8\cdot 3 + 1\cdot 7+7\cdot4 + 2\cdot 1 + 10\cdot 5 = 200$$
+
+\section{Решение задачи симплекс-методом}
+\subsection{Постановка прямой задачи}
+\noindent Так как наша задача является канонической задачей линейного программирования, то мы можем решить ее симплекс-методом. Для этого приведем ее к виду СЛАУ.
+\begin{equation*}
+    \begin{cases}
+    x_1_1 + x_1_2 + x_1_3 + x_1_4 + x_1_5 = 11\\
+    x_2_1 + x_2_2 + x_2_3 + x_2_4 + x_{25} =15\\
+    x_{31} + x_{32} + x_{33} + x_{34} + x_{35} = 10\\
+    x_{41} + x_{42} + x_{43} + x_{44} + x_{45} = 10\\
+    x_1_1 + x_2_1 + x_{31} + x_{41} = 11\\
+    x_1_2 + x_2_2 + x_{32} + x_{42} = 8\\
+    x_1_3 + x_2_3 + x_{33} + x_{43} = 10\\
+    x_1_4 + x_2_4 + x_{34} + x_{44} = 9\\
+    x_1_5 + x_{25} + x_{35} + x_{45} = 8\\
+    x_i_j \ge 0, ~~ 1 \le i \le 4, ~~ 1 \le j \le 5
+    \end{cases}
+    \label{sys}
+\end{equation*}    
+\begin{equation*}
+    F = \displaystyle\sum_{i=1}^{4}\sum_{j=1}^{5} c_{ij}x_{ij} \longrightarrow min
+\end{equation*}
+\noindent Однако, если мы сложим первые 4 строчки и последние 5, мы получим одно и то же выражение. Строки этой матрицы - линейнозависимы. Исключим из рассмотрения последнее уравнение, тогда получим:
+\begin{equation*}
+    \begin{cases}
+   x_1_1 + x_1_2 + x_1_3 + x_1_4 + x_1_5 = 11\\
+    x_2_1 + x_2_2 + x_2_3 + x_2_4 + x_{25} =15\\
+    x_{31} + x_{32} + x_{33} + x_{34} + x_{35} = 10\\
+    x_{41} + x_{42} + x_{43} + x_{44} + x_{45} = 10\\
+    x_1_1 + x_2_1 + x_{31} + x_{41} = 11\\
+    x_1_2 + x_2_2 + x_{32} + x_{42} = 8\\
+    x_1_3 + x_2_3 + x_{33} + x_{43} = 10\\
+    x_1_4 + x_2_4 + x_{34} + x_{44} = 9\\
+    x_i_j \ge 0, ~~ 1 \le i \le 4, ~~ 1 \le j \le 5
+    \end{cases}
+\end{equation*}    
+
+\noindent Значения $c_i$ будем брать из транспортной таблицы \eqref{tab:Tabel1}
+\\\\
+Вектор решения прямой задачи - план:
+$$x^{*} = (1~0~10~0~0~0~0~0~7~8~0~8~0~2~0~10~0~0)^T$$
+
+\noindent Значение функции цели принимает значение:
+$$F =1\cdot 8+10\cdot 7 + 7\cdot 2 + 8\cdot 3 + 8\cdot 4 + 2\cdot 5 + 10\cdot 7 = 200$$
+
+\noindent Если сравним полученные результаты симлпекс-методом и методом потенциалов, заметим что вектор решения $x^{*}$ отличается, однако значение целевой функции совпало.
+
+\subsection{Постановка двойственной задачи}
+\begin{equation*}
+    \begin{cases}
+        \displaystyle y_1 + y_5 \leq 8,\\
+        \displaystyle y_1 + y_6 \leq 5,\\
+        \displaystyle y_1 + y_7 \leq 7,\\
+        \displaystyle y_1 + y_8 \leq 5,\\
+        \displaystyle y_1 \leq 4,\\
+        \displaystyle y_2 + y_5 \leq 9,\\
+        \displaystyle y_2 + y_6 \leq 6,\\
+        \displaystyle y_2 + y_7 \leq 8,\\
+        \displaystyle y_2 + y_8 \leq 2,\\
+        \displaystyle y_2  \leq 3,\\
+        \displaystyle y_3 + y_5 \leq 7,\\
+        \displaystyle y_3 + y_6 \leq 4,\\
+        \displaystyle y_3 + y_7 \leq 7,\\
+        \displaystyle y_3 + y_8 \leq 1,\\
+        \displaystyle y_3\leq 4,\\
+        \displaystyle y_4 + y_5 \leq 5,\\
+        \displaystyle y_4 + y_6 \leq 4,\\
+        \displaystyle y_4 + y_7 \leq 7,\\
+        \displaystyle y_4 + y_8 \leq 1,\\
+        \displaystyle y_4\leq 2,\\
+        \displaystyle y_{i}\in \mathbb{R},~~1\leq i \leq 8.
+    \end{cases}
+\end{equation*}
+\begin{equation*}
+F = 11y_1 + 15y_2 + 10y_3 + 10y_4 + 11y_5 + 8y_6 + 10y_7 + 9y_8\to max. 
+\end{equation*}
+Все ограничения содержат неравенства,значит необходимо приведение к каноническому виду.
+\subsubsection{Приведение двойственной задачи к канонической форме}
+\noindent Для того, чтобы привести задачу к канонической форме воспользуемся алгоритмом, который изучили в прошлой лабораторной работе (Решение задач линейного программирования симплекс-методом). Введём новые переменные с ограничением на знаки:
+$$y_1=u_1-v_1$$
+$$y_2=u_2-v_2$$
+$$y_3=u_3-v_3$$
+$$y_4=u_4-v_4$$
+$$y_5=u_5-v_5$$
+$$y_6=u_6-v_6$$
+$$y_7=u_7-v_7$$
+$$y_8=u_8-v_8$$
+а также добавим дополнительные переменные $t_j~~j=1...20$ чтобы неравенства превратить в равенства.
+
+\begin{equation*}
+    \begin{cases}
+        \displaystyle y_1 + y_5 \leq 8,\\
+        \displaystyle y_1 + y_6 \leq 5,\\
+        \displaystyle y_1 + y_7 \leq 7,\\
+        \displaystyle y_1 + y_8 \leq 5,\\
+        \displaystyle y_1 \leq 4,\\
+        \displaystyle y_2 + y_5 \leq 9,\\
+        \displaystyle y_2 + y_6 \leq 6,\\
+        \displaystyle y_2 + y_7 \leq 8,\\
+        \displaystyle y_2 + y_8 \leq 2,\\
+        \displaystyle y_2  \leq 3,\\
+        \displaystyle y_3 + y_5 \leq 7,\\
+        \displaystyle y_3 + y_6 \leq 4,\\
+        \displaystyle y_3 + y_7 \leq 7,\\
+        \displaystyle y_3 + y_8 \leq 1,\\
+        \displaystyle y_3\leq 4,\\
+        \displaystyle y_4 + y_5 \leq 5,\\
+        \displaystyle y_4 + y_6 \leq 4,\\
+        \displaystyle y_4 + y_7 \leq 7,\\
+        \displaystyle y_4 + y_8 \leq 1,\\
+        \displaystyle y_4\leq 2,\\
+        \displaystyle y_{i}\in \mathbb{R}, &1\leq i \leq 8.
+    \end{cases}
+    \Rightarrow
+    ~~~~
+    \begin{cases}
+        \displaystyle u_1 - v_1 + u_5 - v_5 + t_1 = 8,\\
+        \displaystyle u_1 - v_1 + u_6 - v_6 + t_2 = 5,\\
+        \displaystyle u_1 - v_1 + u_7 - v_7 + t_3 = 7,\\
+        \displaystyle u_1 - v_1 + u_8 - v_8 + t_4 = 5,\\
+        \displaystyle u_1 - v_1 + t_5 = 4,\\
+        \displaystyle u_2 - v_2 + u_5 - v_5 + t_6 = 9,\\
+        \displaystyle u_2 - v_2 + u_6 - v_6 + t_7 = 6,\\
+        \displaystyle u_2 - v_2 + u_7 - v_7 + t_8 = 8,\\
+        \displaystyle u_2 - v_2 + u_8 - v_8 + t_9 = 2,\\
+        \displaystyle u_2 - v_2 + t_{10} = 3,\\
+        \displaystyle u_3 - v_3 + u_5 - v_5 + t_{11} = 7,\\
+        \displaystyle u_3 - v_3 + u_6 - v_6 + t_{12} = 4,\\
+        \displaystyle u_3 - v_3 + u_7 - v_7 + t_{13} = 7,\\
+        \displaystyle u_3 - v_3 + u_8 - v_8 + t_{14} = 1,\\
+        \displaystyle u_3 - v_3 + t_{15} = 4,\\
+        \displaystyle u_4 - v_4 + u_5 - v_5 + t_{16} = 5,\\
+        \displaystyle u_4 - v_4 + u_6 - v_6 + t_{17} = 4,\\
+        \displaystyle u_4 - v_4 + u_7 - v_7 + t_{18} = 7,\\
+        \displaystyle u_4 - v_4 + u_8 - v_8 + t_{19} = 1,\\
+        \displaystyle u_4 - v_4 + t_{20} = 2,\\
+        \displaystyle u_{i}, v_i\geq 0,~~1\leq i \leq 8,\\
+        \displaystyle t_{j}\geq 0,~~1\leq j \leq 20.
+    \end{cases}
+\end{equation*}
+
+
+\begin{eqnarray*}
+    F = (11u_1 + 15u_2 + 10u_3 + 10u_4 + 11u_5 + 8u_6 + 10u_7 + 9u_8) - \nonumber \\
+    (11v_1 + 15v_2 + 10v_3 + 10v_4 + 11v_5 + 8v_6 + 10v_7 + 9v_8)\to max.
+\end{eqnarray*}
+Вектор решения двойственной канонической задачи: 
+\begin{equation*}
+    y^* = \begin{pmatrix}
+        2& 0& 2& 2& 3& 2& 5 & 0& 0& 0& 0& 0 &0& 0& 0 & 1 & 3 & 1 & 0 & 4 & 2 & 6 & 4 & 3 & 3 & 3 & 2 & 0 & 0 & 0 & 2 &0 & 0 & 0 & 0 & 0
+    \end{pmatrix}^T
+\end{equation*}
+
+\noindent Значение целевой функции равно $F=200$
+
+\section{Оценка достоверности полученного результата}
+\subsection{Проверка результатов, полученных методом потенциалов}
+\noindent Для проверки оптимальности решения, необходимо выполнение $u_i+v_j \le c_{ij}$ условий во всех пустых клетках, помеченных <<-->>
+
+\begin{equation*}
+ c = 
+    \begin{pmatrix}
+        8 & 5 & 7 & 5 & 4 \\
+        9 & 6 & 8 & 2 & 3\\
+        7 & 4 & 7 & 1 & 4\\
+        5 & 4 & 7 & 1 & 2\\
+    \end{pmatrix},~~
+u^*=
+    \begin{pmatrix}
+        0 &0 &-1 &-3
+    \end{pmatrix}
+,\;\;v^*=
+    \begin{pmatrix}
+        8 &5 &7 &2 &3
+    \end{pmatrix}\\
+\end{equation*}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 &  \\ \hline
+       \cellcolor{myGren} A_1 &  - & 1 & 10 & - & - & 11\\ \hline
+       \cellcolor{myGren} A_2 & - & - & - & 7 & 8 & 15\\  \hline
+       \cellcolor{myGren} A_3 & 1 & 7 & - & 2 & - & 10\\ \hline
+       \cellcolor{myGren} A_4 & 10 & - & - & - & - & 10\\ \hline \hline
+            & 11 &  8 & 10 & 9 & 8 & \\
+        \hline
+    \end{tabular}
+    \label{tab:my_label}
+\end{table}
+
+\noindent Проверяем клетку $A_1B_1:$
+$$u_1+v_1=0+8=8 \le 8$$
+\noindent Проверяем клетку $A_1B_4:$
+$$u_1+v_4=0+2=2 \le 5$$
+\noindent Проверяем клетку $A_1B_5:$
+$$u_1+v_5=0+3=3 \le 4$$
+\noindent Проверяем клетку $A_2B_1:$
+$$u_2+v_1=0+8=8 \le 9$$
+\noindent Проверяем клетку $A_2B_2:$
+$$u_2+v_2=0+5=5 \le 6$$
+\noindent Проверяем клетку $A_2B_3:$
+$$u_2+v_3=0+7=7 \le 8$$
+\noindent Проверяем клетку $A_3B_3:$
+$$u_3+v_3=-1+7=6 \le 7$$
+\noindent Проверяем клетку $A_3B_5:$
+$$u_3+v_5=-1+3=2 \le 4$$
+\noindent Проверяем клетку $A_4B_2:$
+$$u_4+v_2=-3+5=2 \le 4$$
+\noindent Проверяем клетку $A_4B_3:$
+$$u_4+v_3=-3+7=4 \le 7$$
+\noindent Проверяем клетку $A_4B_4:$
+$$u_4+v_4=-3+2=-1 \le 1$$
+\noindent Проверяем клетку $A_4B_5:$
+$$u_4+v_5=-3+3=0 \le 2$$
+Таким образом, полученное решение, действительно, оптимальное.
+
+
+
+\subsection{Проверка результатов, полученных при помощи симплекс-метода}
+\begin{equation*}
+    A=
+    \begin{pmatrix}
+    1 &1 &1 &1 &1 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 \\
+    0 &0 &0 &0 &0 &1 &1 &1 &1 &1 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 \\
+    0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &1 &1 &1 &1 &1 &0 &0 &0 &0 &0 \\
+    0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &0 &1 &1 &1 &1 &1 \\
+    1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 \\
+    0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 \\
+    0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 \\
+    0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 &0 &0 &0 &1 &0 \\
+    \end{pmatrix}
+\end{equation*}
+
+\begin{equation*}
+    b=
+    \begin{pmatrix}
+    11 &15 &10 &10 &11 &8 &10 &9 \\
+    \end{pmatrix}
+\end{equation*}
+\begin{equation*}
+    c = 
+    \begin{pmatrix}
+    8& 5& 7& 5& 4& 9& 6 &8 &2& 3&7 &4& 7 &1 &4 &5& 4& 7& 1 &2\\
+    \end{pmatrix}^T
+\end{equation*}
+\noindent Воспользуемся ранее упомянутой теоремой \eqref{th} и проверим оптимальность полученного решения.
+\begin{equation*}
+    y_\ast^T\left[M\right]\ast A\left[M,N\right]= \begin{pmatrix}
+        8 &5 &7 &2 &0& 8& 5& 7& 2& 0& 7& 4& 6& 1& -1& 5& 2& 4& -1& -3
+    \end{pmatrix}
+\end{equation*}
+\begin{equation*}
+    c^T\left[N\right]-y_\ast^T\left[M\right]\ast A\left[M,N\right]= \begin{pmatrix}
+        0 &0 &0 &3 & 4& 1& 1& 1& 0& 3& 0& 0& 1& 0 &5 & 0 & 2 & 3 & 2 & 5
+    \end{pmatrix}
+    \geq0
+\end{equation*}
+\begin{equation*}
+    \left(c^T\left[N\right]-y_\ast^T\left[M\right]\ast A\left[M,N\right]\right)\ast x_\ast\left[N\right]=0
+\end{equation*}
+Таким образом, полученное решение является оптимальным для нашей задачи.
+
+\section{Решение задачи при условии перепоставок}
+\noindent Транспортные задачи могут быть дополнены различными усложнениями. Это делается для того, чтобы приблизить постановку задачи к некоторой практической ситуации. Приведем примеры усложнений:
+\begin{itemize}
+    \item многопродуктовые постановки
+    \item запрет на поставку, когда из $i-$ого в $j-$ый пункт запрещается перевозить груз
+    \item обязательность поставки
+    \item доставка не менее заданного количества груза
+    \item доставка не более заданного количества груза
+    \item возврат тары и минимизация порожного пробега
+    \item сменно-суточный характер организации доставки
+\end{itemize}
+
+\noindent В нашей работе рассмотрим задачу в условии перепоставок. Пусть общая потребность останется прежней $b = (11~8~10~9~8)$,  а общие запасы на складах увеличим на 15 условных единиц $a = (16~15~15~15)$. Значение штрафов положим равными $p = \{1,~4,~3,~6\}$ соответственно.
+Задача в данной постановке не является закрытой, так как $\displaystyle\sum_{j=1}^{5} b_{j}  \le \displaystyle\sum_{i=1}^{4} a_{i}$.
+\\\\
+Введём фиктивного потребителя $B_ф$ с потребностью $b_ф= \sum_{i=1}^{4} a_{i}-\sum_{j=1}^{5} b_{j}$ и соответствующие тарифы равными нулю: $c_i_ф=0,~~i=1...4$
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 & \cellcolor{myGren} B_ф &  \\ \hline
+       \cellcolor{myGren} A_1 & 8 & 5 & 7 & 5 & 4 & 0 & 16\\ \hline
+       \cellcolor{myGren} A_2 & 9 & 6 & 8 & 2 & 3 & 0 & 15\\  \hline
+       \cellcolor{myGren} A_3 & 7 & 4 & 7 & 1 & 4 & 0 & 15\\ \hline
+       \cellcolor{myGren} A_4 & 5 & 4 & 7 & 1 & 2 & 0& 15\\ \hline\hline
+            & 11 & 8 & 10 & 9 & 8 & 15 & \\
+            \hline
+    \end{tabular}
+ \end{table}
+ 
+\noindent Введём в расмотрение, что мы должны учесть штрафы за хранение товара на складах. Будем считать, что стоимости штрафов равносильны стоимости перевозок в фиктивный пункт назначения.
+Математически это запишем: 
+$$c_i_ф = с_i_ф + p_i$$
+Тогда транспортная таблица примет вид: 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 & \cellcolor{myGren} B_ф &  \\ \hline
+       \cellcolor{myGren} A_1 & 8 & 5 & 7 & 5 & 4 & 1 & 16\\ \hline
+       \cellcolor{myGren} A_2 & 9 & 6 & 8 & 2 & 3 & 4 & 15\\  \hline
+       \cellcolor{myGren} A_3 & 7 & 4 & 7 & 1 & 4 & 3 & 15\\ \hline
+       \cellcolor{myGren} A_4 & 5 & 4 & 7 & 1 & 2 & 6& 15\\ \hline\hline
+            & 11 & 8 & 10 & 9 & 8 & 15 & \\
+            \hline
+    \end{tabular}
+ \end{table}
+
+\noindent Оптимальное решение данной задачи получим равным: 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c| |c|}
+    \hline
+        &\cellcolor{myGren} B_1 & \cellcolor{myGren}B_2 & \cellcolor{myGren}B_3 & \cellcolor{myGren}B_4 & \cellcolor{myGren} B_5 & \cellcolor{myGren} B_ф &  \\ \hline
+       \cellcolor{myGren} A_1 & - & - & 1 & - & - & 15 & 16\\ \hline
+       \cellcolor{myGren} A_2 & - & - & 7 & - & 8 & - & 15\\  \hline
+       \cellcolor{myGren} A_3 & - & 4 & 2 & 9 & - & - & 15\\ \hline
+       \cellcolor{myGren} A_4 & 11 & 4 & - & - & - & - & 15\\ \hline\hline
+            & 11 & 8 & 10 & 9 & 8 & 15 & \\
+            \hline
+    \end{tabular}
+\end{table}
+$$x^{*} = (0~0~1~0~0~15~0~0~7~0~8~0~0~4~2~9~0~0~11~4~0~0~0~0)$$
+\noindent Векторы потенциалов при этом равны:
+\begin{equation*}
+u^*=
+    \begin{pmatrix}
+        0 &1 &0 &0
+    \end{pmatrix}
+,\;\;v^*=
+    \begin{pmatrix}
+        5 &4 &7 &1 &2 &1
+    \end{pmatrix}\\
+\end{equation*}
+Целевая функция принимает значение:
+$$F = 1\cdot 7 + 15\cdot 1 + 7\cdot 8 + 8\cdot 3 + 4\cdot 4 + 2\cdot 7 + 9\cdot 1 + 11\cdot 5+ 4\cdot 4 = 212$$
+Проверим оптимальность полученного плана:\\\\
+Клетка $A1B1:~u_1+v_1=0+5=5\le8$\\
+Клетка $A_1B_2:~u_1+v_2=0+4=4\le5$\\
+Клетка $A_1B_4:~u_1+v_4=0+1=1\le 5$\\
+Клетка $A_1B_5:~u_1+v_5=0+2=2\le 4$\\
+Клетка $A_2B_1:~u_2+v_1=1+5=6\le 9$\\
+Клетка $A_2B_2:~u_2+v_2=1+4=5\le 6$\\
+Клетка $A_2B_4:~u_2+v_4=1+1=2\le 2$\\
+Клетка $A_2B_ф:~u_2+v_6=1+1=2\le 4$\\
+Клетка $A_3B_1:~u_3+v_1=0+5=5\le 7$\\
+Клетка $A_3B_5:~u_3+v_5=0+2=2\le 4$\\
+Клетка $A_3B_ф:~u_3+v_6=0+1=1\le 3$\\
+Клетка $A_4B_3:~u_4+v_3=0+7=7\le 7$\\
+Клетка $A_4B_4:~u_4+v_4=0+1=1\le 1$\\
+Клетка $A_4B_5:~u_4+v_5=0+2=2\le 2$\\
+Клетка $A_4B_ф:~u_4+v_6=0+1=1\le 6$\\
+
+\noindent Действительно, найденный нами план является оптимальным.
+
+\section{Программная реализация}
+\noindent В процессе реализации алгоритмов использовался язык программирования Python3.6. Для проверки полученных решений пользовались пакетом MATLAB2020b.
+\\\\
+\noindent Исходный код находится в системе контроля версий GitHub 
+\\
+https://github.com/Brightest-Sunshine/Optimization-methods-2021/tree/master/TransportTask/code
+
+
+\section{Результаты работы программы}
+\noindent На вход нашей программе поступает текстовый файл с проблемой
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{P0.JPG}}
+\label{fig:image}
+\end{figure}
+\noindent Далее в консоль выводятся промежуточные вычисления. Данная задача решилась за семь итераций. Приведём на скриншоте последнюю седьмую итерацию работы алгоритма.
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{R1.JPG}}
+\label{fig:image}
+\end{figure}
+
+\noindent Аналогично приведем скриншоты решения задачи с усложнением:
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{P1.JPG}}
+\label{fig:image}
+\end{figure}
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{R2.JPG}}
+\label{fig:image}
+\end{figure}
+
+\section{Дополнительные замечания}
+\noindent При решении поставленной задачи симплекс-методом обнаружили, что полученный оптимальный вектор, отличается от результата, найденного при помощи метода потенциалов. Однако значение целевых функций совпали. Это связано с тем, что в симплекс-методе мы "подменили" нашу исходную задачу путём вычеркивания одного уравнения. Мы вычеркнули восьмую строку. 
+\\\\
+\noindent Проведём эксперимент, в котором последовательно будем видоизменять исходную систему, поочерёдно вычеркивая из нее по одной строке.
+
+\noindent Решение задачи \eqref{sys} без первой, или второй, или третьей, или четвёртой, или пятой, или седьмой, или восьмой строк равняется:
+
+$$x^{*} = (1~0~10~0~0~0~0~0~7~8~0~8~0~2~0~10~0~0)^T$$
+
+\noindent Решение задачи \eqref{sys} без шестой строки:
+$$x^{*} = (0~1~10~0~0~0~0~0~7~8~1~7~0~2~0~10~0~0~0~0)^T$$
+
+\noindent Обратимся к дополнительному пособию:
+\begin{theorem}
+Если основная задача линейного программирования имеет оптимальный план, то
+минимальное значение целевая функция задачи принимает в одной из вершин многогранника решений. Если минимальное значение целевая функция задачи принимает
+более чем в одной вершине, то она принимает его во всякой точке, являющейся
+выпуклой комбинацией этих вершин.
+\end{theorem}
+
+\noindent В ходе нашего эксперимента мы нашли два оптимальных вектора задачи, а значит любая выпуклая комбинация этих решений будет являться также решением. Исходя из данных рассуждений делаем вывод, что общее число решений - неограничено. 
+
+\begin{thebibliography}{9}
+\bibitem{akulich} Акулич И.Л. Математическое программирование в примерах и задачах: учеб. пособие. -- СПб.: Изд-во 'Лань', 2011. -- 352с.: ил.
+\bibitem{book1} 
+Волков И. К., Загоруйко Е. А.; ред. Зарубин В. С., Крищенко А. П. 
+\textit{Исследование операций: учебник для втузов}. 
+Изд-во МГТУ им. Н. Э. Баумана, 2000. - 435 с. 
+\bibitem{book2}
+Конюховский П. В.
+\textit{Математические методы исследования операций в экономике}.
+Изд-во СПб: Питер, 2000.-208с.:ил.-(Серия "Краткий курс")
+\end{thebibliography}
+\end{document}
