@@ -21,7 +21,15 @@ def dichotomy(func, a, b, counter, eps):
 def fibonacciSequence(n):
     if n == 1 or n == 2:
         return 1
-    return fibonacciSequence(n - 1) + fibonacciSequence(n - 2)
+    step_1 = 1
+    step_2 = 1
+    for i in range(2, n):
+        tmp = step_2
+        step_2 = step_1
+        step_1 = tmp + step_2
+        # print(step_1)
+    return step_1
+    # return fibonacciSequence(n - 1) + fibonacciSequence(n - 2)
 
 
 def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps):
@@ -64,3 +72,5 @@ def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps):
         else:
             print('next interval [' + str(lambd) + ',' + str(b) + ']')
             fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps)
+
+# fibonacciSequence(10)
