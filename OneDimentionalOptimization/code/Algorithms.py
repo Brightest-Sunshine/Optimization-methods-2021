@@ -1,5 +1,7 @@
-def dichotomy(func, a, b, counter, eps):
-    print('start interval [' + str(a) + ',' + str(b) + ']')
+from functions import Functions
+
+
+def dichotomy(func, a, b, counter, eps, msg=False):
     while b - a > eps:
         mean = (a + b) / 2
         delta = 0.001 * (b - a)
@@ -7,18 +9,22 @@ def dichotomy(func, a, b, counter, eps):
         f_x1, f_x2 = func(x1), func(x2)
         counter = counter + 2
         if f_x1 <= f_x2:
-            print('next interval [' + str(a) + ',' + str(x2) + ']')
+            if msg:
+                print('next interval [' + str(a) + ',' + str(x2) + ']')
             b = x2
         else:
             a = x1
-            print('next interval [' + str(x1) + ',' + str(b) + ']')
-    print('number of requests is ' + str(counter))
-    print('x* = ' + str((a + b) / 2))
-    print('f(x*) = ' + str(func((a + b) / 2)))
-    return b - a
+            if msg:
+                print('next interval [' + str(x1) + ',' + str(b) + ']')
+    # print('number of requests is ' + Functions.f1_counter)
+    res = func((a + b) / 2)
+    if msg:
+        print('x* = ' + str((a + b) / 2))
+        print('f(x*) = ' + str(res))
+    return b - a, (a + b) / 2, res
 
 
-def fibonacciSequence(n):
+def fibonacciSequence(n):  # TODO переписать через генератор
     if n == 1 or n == 2:
         return 1
     step_1 = 1
@@ -32,7 +38,7 @@ def fibonacciSequence(n):
     # return fibonacciSequence(n - 1) + fibonacciSequence(n - 2)
 
 
-def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps):
+def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps, msg=False):
     if k <= n - 2:
         if lambd == float('inf'):
             lambd = a + fibonacciSequence(n - k - 1) / fibonacciSequence(n - k + 1) * (b - a)
@@ -52,25 +58,31 @@ def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps):
             f2 = func(mu)
             counter += 1
     else:
-        print("x* = " + str((a + b) / 2))
-        print('f(x*) = ' + str(func((a + b) / 2)))
-        print('number of requests is ' + str(counter))
-        return b - a
+        res = func((a + b) / 2)
+        if msg:
+            print("x* = " + str((a + b) / 2))
+
+            print('f(x*) = ' + str(res))
+        # print('number of requests is ' + str(counter))
+        return b - a, (a + b) / 2, res
 
     if f1 > f2:
         prev_f = f2
-        print('next interval [' + str(lambd) + ',' + str(b) + ']')
+        if msg:
+            print('next interval [' + str(lambd) + ',' + str(b) + ']')
         if k < n - 2:
-            fibonacci(func, lambd, b, n, k + 1, mu, float('inf'), prev_f, counter, eps)
+            return fibonacci(func, lambd, b, n, k + 1, mu, float('inf'), prev_f, counter, eps, msg)
         else:
-            fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps)
+            return fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps, msg)
     else:
         prev_f = f1
         if k < n - 2:
-            print('next interval [' + str(a) + ',' + str(mu) + ']')
-            fibonacci(func, a, mu, n, k + 1, float('inf'), lambd, prev_f, counter, eps)
+            if msg:
+                print('next interval [' + str(a) + ',' + str(mu) + ']')
+            return fibonacci(func, a, mu, n, k + 1, float('inf'), lambd, prev_f, counter, eps, msg)
         else:
-            print('next interval [' + str(lambd) + ',' + str(b) + ']')
-            fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps)
+            if msg:
+                print('next interval [' + str(lambd) + ',' + str(b) + ']')
+            return fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps, msg)
 
 # fibonacciSequence(10)
