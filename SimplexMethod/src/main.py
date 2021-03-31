@@ -6,7 +6,7 @@ with file_reader.reader("problem.txt") as data:  # Читаем условие �
     canon_system = canon.convert_to_canon(data)
 Np_Canon_Form = simplex_method.np_canonical_form(canon_system)
 x = simplex_method.starting_vector(Np_Canon_Form)
-print("--- simplex algorithm: primal problem ---")
+print("simplex algorithm: primal problem")
 print(simplex_method.simplex_method(Np_Canon_Form, x).x)
 
 # creating dualproblem
@@ -23,5 +23,5 @@ DualCanonSys = canon.convert_to_canon([trans_A, new_matrix_signs, new_b, new_c, 
 
 NpCanonForm = simplex_method.np_canonical_form(DualCanonSys)
 x = simplex_method.starting_vector(NpCanonForm)
-print("--- simplex algorithm: dual problem ---")
+print("simplex algorithm: dual problem")
 print(simplex_method.simplex_method(NpCanonForm, x).x)

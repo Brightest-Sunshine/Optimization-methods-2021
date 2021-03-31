@@ -36,7 +36,7 @@ def convert_var_signs(VariablesSigns, x):  # Меняем значения зн�
             x[i] = -x[i]
             VariablesSigns[i] = ">="
             u.append(0)
-        elif VariablesSigns[i] == "":
+        elif VariablesSigns[i] == "x":
             u.append(1)
         else:
             u.append(0)

@@ -64,10 +64,12 @@ def starting_vector(cf:np_canonical_form) -> np.array:
         if np.linalg.det(AMNk) != 0:
             xNk = np.matmul(np.linalg.inv(AMNk), cf.b)
             if np.min(xNk) < 0:
+                print(xNk)
                 continue  # we need only vectors with all positive components
             xN = np.zeros(cf.n)
             for i in range(len(Nk)):
                 xN[Nk[i]] = xNk[i]
+            print(xNk)
             return xN
     print("error, initial vector not found!")
     return np.zeros(cf.n)
@@ -100,7 +102,7 @@ def simplex_step(cf: np_canonical_form, xkN: np.array) -> (np.array, np.array, b
         dkN = cN - np.matmul(AMN.T, ykM)
         dkLk = np.array([dkN[int(i)] for i in Lk])
         if np.min(dkLk) >= -1e-4:  # xkN уже является оптимальным вектором
-            print("solution found at iteration " + str(binom_idx + 1))
+            #print("solution found at iteration " + str(binom_idx + 1))
             return xkN, Nk, True
         jk = Lk[list(filter(lambda j: dkLk[j] < -1e-4, range(len(Lk))))[0]]  # индекс первой негативной компоненты в dkLk
         xkNk0, xkNk_plus, Nk0, Nk_plus = split_xkN(xkN)
@@ -111,8 +113,10 @@ def simplex_step(cf: np_canonical_form, xkN: np.array) -> (np.array, np.array, b
         if len(Nk_plus) == len(Nk) or max([ukNk[i] for i in filter(lambda j: Nk[j] not in Nk_plus, range(len(Nk)))]) < 0:
             ukN = [ukNk[list(Nk).index(i)] if i in Nk else 0 for i in range(cf.n)]
             ukN[jk] = -1
+            #print(xkN)
             theta_k = min([xkN[i]/ukN[i] for i in filter(lambda j: ukN[j] > 0, Nk)])
             return xkN - np.multiply(theta_k, ukN), Nk, False
+
     print("iterations ended with no result, something went wrong.")
     return xkN, np.array([]), True  # что-то пошло не так
 
@@ -131,4 +135,5 @@ def simplex_method(cf: np_canonical_form, x_start: np.array, max_iter: int = 20)
     if len(Nk) == 0 or np.max(xkN) == np.inf:
         return SimplexResult(xkN, Nk, False)
     else:
+        #print(xkN)
         return SimplexResult(xkN, Nk, True)

@@ -1,4 +1,4 @@
-from functions import Functions
+from math import sqrt
 
 
 def dichotomy(func, a, b, counter, eps, msg=False):
@@ -22,6 +22,39 @@ def dichotomy(func, a, b, counter, eps, msg=False):
         print('x* = ' + str((a + b) / 2))
         print('f(x*) = ' + str(res))
     return b - a, (a + b) / 2, res
+
+
+def goldenSection(func, a, b, eps):
+    # print(type(func))
+    # x1 = a + ((3 - sqrt(5)) / 2) * (b - a)
+    # x2 = a + ((sqrt(5) - 1) / 2) * (b - a)
+    #print("basic a", func(1/100))
+    phi = (1 + sqrt(5)) / 2
+    x1 = b - (b - a) / phi
+    x2 = a + (b - a) / phi
+    f_x1, f_x2 = func(x1), func(x2)
+    # print(f_x1,f_x2)
+    tau = (sqrt(5) - 1) / 2
+    tau = 1/phi
+    eps_n = (b - a) / 2
+    while eps_n > eps:
+        #print("fы" ,f_x1," ",f_x2)
+        if f_x1 <= f_x2:
+            b = x2
+            x2 = x1
+            f_x2 = f_x1
+            x1 = b - tau * (b - a)
+            f_x1 = func(x1)
+        else:
+            a = x1
+            x1 = x2
+            f_x1 = f_x2
+            x2 = a + tau * (b - a)
+            f_x2 = func(x2)
+        eps_n = tau * eps_n
+    x_min = (a + b) / 2
+    #print("min a", func(x_min))
+    return x_min
 
 
 def fibonacciSequence(n):  # TODO переписать через генератор
@@ -84,5 +117,3 @@ def fibonacci(func, a, b, n, k, lambd, mu, prev_f, counter, eps, msg=False):
             if msg:
                 print('next interval [' + str(lambd) + ',' + str(b) + ']')
             return fibonacci(func, lambd, b, n, k + 1, mu, lambd, prev_f, counter, eps, msg)
-
-# fibonacciSequence(10)
